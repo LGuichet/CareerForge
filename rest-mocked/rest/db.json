@@ -1,0 +1,20 @@
+{
+  "profil": [
+    {
+      "id": "1",
+      "nom": "Leponge",
+      "prenom": "robert"
+    }
+  ],
+  "competence": [
+    {
+      "id": "1",
+      "labal": "Api Rest",
+      "categorie": "technique",
+      "type": "hard"
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}

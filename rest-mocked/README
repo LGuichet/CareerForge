@@ -1,0 +1,37 @@
+# Rest-Mocked
+
+## Construction
+
+Construire l'image par:
+``
+docker build -t json-server .
+``
+
+## Parametrage
+
+Il suffit de changer le fichier de description de l'api dans ./rest/db.json.
+ex:
+
+``` json
+{
+  "posts": [
+    { "id": "1", "title": "a title", "views": 100 },
+    { "id": "2", "title": "another title", "views": 200 }
+  ],
+  "comments": [
+    { "id": "1", "text": "a comment about post 1", "postId": "1" },
+    { "id": "2", "text": "another comment about post 1", "postId": "1" }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}
+```
+
+## Utilisation
+
+Par défault: <http://http://localhost:3000/*ressource de votre db.json*>
+
+Chauqe ressource est disponible en POST / GET / DELETE ...etc
+
+[doc api](https://github.com/typicode/json-server?tab=readme-ov-file)
