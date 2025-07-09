@@ -3,9 +3,13 @@ name : rest-mocked
 services:
   back:
     container_name: rest-mocked
-    image: json-server
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
-      - ./rest/db.json:/data/db.json
-    command: json-server --watch /data/db.json --host 0.0.0.0
+      - rest-db:/data
+      
+volumes:
+  rest-db: {}   
