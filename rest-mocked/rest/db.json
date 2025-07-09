@@ -2,8 +2,8 @@
   "profil": [
     {
       "id": "1",
-      "nom": "Leponge",
-      "prenom": "robert"
+      "username": "Leponge",
+      "lastname": "robert"
     }
   ],
   "competence": [

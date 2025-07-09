@@ -4,26 +4,19 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod/v4";
 import { Input } from "../ui/input"
+import { useUpdateProfil } from "@/hooks/useUpdateProfil";
 
 const formSchema = z.object({
-  username: z.string().min(1, {
-    message: "le prenom doit contenir au moins 1 caractère",
-  }),
-  lastname: z.string().min(1, {
-    message: "le nom doit contenir au moins 1 caractère",
-  }),
-  professionalTitle: z.string().min(1, {
-    message: "le titre professionnel doit contenir au moins 1 caractère",
-  }),
-  email: z.email("veuillez fournir un email valide"),
-  phone: z.e164("Veuillez fournir un numero de telephone valide"),
-  address: z.string().min(1, {
-    message: "l'adresse doit contenir au moins 1 caractère",
-  }),
-  professionalResume: z.string().min(1, {
-    message: "le résumé professionel doit contenir au moins 1 caractère",
-  })
+  username: z.string().min(1).optional(),
+  lastname: z.string().min(1).optional(),
+  professionalTitle: z.string().min(1).optional(),
+  email: z.email().optional(),
+  phone: z.e164().optional(),
+  address: z.string().min(1).optional(),
+  professionalResume: z.string().min(1).optional(),
 })
+
+export type FormValues = z.infer<typeof formSchema>
 
 function Field({
   id,
@@ -48,30 +41,31 @@ function Field({
 }
 
 export function PersonalDataForm() {
+
+  const mutation = useUpdateProfil()
+
   const {
     register,
-    handleSubmit,
     formState: { errors },
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
-    defaultValues: {
-      username: "",
-      lastname: "",
-      professionalTitle: "",
-      email: "",
-      phone: "",
-      address: "",
-      professionalResume: "",
+    defaultValues: {}
+  })
+
+  const bind = (name: keyof FormValues) => {
+    // on récupère les handlers de register
+    const { onBlur: formOnBlur, ...rest } = register(name)
+
+    return {
+      ...rest,
+      onBlur: async (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        formOnBlur(e)                       // validation zod
+        const value = e.target.value
+        mutation.mutate({ [name]: value })  // envoi partiel
+      },
     }
-  })
-
-  const submit = handleSubmit(data => {
-    console.log("Auto-submit", data)
-  })
-
-   const auto = (name: keyof z.infer<typeof formSchema>) =>
-    register(name, { onBlur: submit })
+  }
 
   return (
     <>
@@ -84,7 +78,7 @@ export function PersonalDataForm() {
             <Input
               id="username"
               placeholder="Votre prénom"
-              {...auto("username")}
+              {...bind("username")}
               aria-invalid={!!errors.username}
               className="transition-colors"
             />
@@ -94,7 +88,7 @@ export function PersonalDataForm() {
             <Input
               id="lastname"
               placeholder="Votre nom"
-              {...auto("lastname")}
+              {...bind("lastname")}
               aria-invalid={!!errors.lastname}
               className="transition-colors"
             />
@@ -110,7 +104,7 @@ export function PersonalDataForm() {
           <Input
             id="professionalTitle"
             placeholder="Ex : Développeur fullstack, Chef de projet…"
-            {...auto("professionalTitle")}
+            {...bind("professionalTitle")}
             aria-invalid={!!errors.professionalTitle}
             className="transition-colors"
           />
@@ -124,7 +118,7 @@ export function PersonalDataForm() {
               id="email"
               type="email"
               placeholder="votre.email@exemple.com"
-              {...auto("email")}
+              {...bind("email")}
               aria-invalid={!!errors.email}
               className="transition-colors"
             />
@@ -135,7 +129,7 @@ export function PersonalDataForm() {
               id="phone"
               type="tel"
               placeholder="+33555555555"
-              {...auto("phone")}
+              {...bind("phone")}
               aria-invalid={!!errors.phone}
               className="transition-colors"
             />
@@ -147,14 +141,14 @@ export function PersonalDataForm() {
           <Input
             id="address"
             placeholder="Ville, Pays"
-            {...auto("address")}
+            {...bind("address")}
             aria-invalid={!!errors.address}
             className="transition-colors"
           />
         </Field>
 
         {/* Resume professionnel */}
-       <Field
+        <Field
           id="professionalResume"
           label="Résumé professionnel"
           error={errors.professionalResume?.message}
@@ -162,12 +156,19 @@ export function PersonalDataForm() {
           <textarea
             id="professionalResume"
             placeholder="Décrivez brièvement votre profil…"
-            {...auto("professionalResume")}
+            {...bind("professionalResume")}
             aria-invalid={!!errors.professionalResume}
             className="border border-gray-300 rounded-md p-2 text-base transition-colors focus:ring-2 focus:ring-primary w-full"
             rows={4}
           />
         </Field>
+
+        {/* Feedback */}
+        {mutation.isPending && <p>Envoi en cours…</p>}
+        {mutation.isError && (
+          <p className="text-red-500">Erreur : {mutation.error.message}</p>
+        )}
+        {mutation.isSuccess && <p className="text-green-600">Champ mis à jour ✔️</p>}
       </form>
     </>
   )
