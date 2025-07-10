@@ -1,6 +1,7 @@
 import { PersonalDataForm } from "@/components/sections/personalDataForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IconBriefcase, IconCarambola, IconSchool, IconUser } from "@tabler/icons-react";
+import { ExperienceDataVue } from "../components/sections/experienceDataVue";
 
 export default function Home() {
   return (
@@ -23,7 +24,7 @@ export default function Home() {
           </TabsContent>
           <TabsContent value="experiences">
             <div className="flex flex-col gap-4">
-              Expériences
+              <ExperienceDataVue />
             </div>
           </TabsContent>
           <TabsContent value="formations">
